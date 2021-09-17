@@ -2,6 +2,7 @@ package com.nursery.service.userfront;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -34,21 +35,26 @@ public class UserFrontServiceImpl implements UserFrontService {
 							if(ur!=null) {
 								BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 								String hashPassword = bCryptPasswordEncoder.encode(passWord);
-
-								UserFrontVo userFrontVo = new UserFrontVo();
-								List<UserRoleVo> roles = new ArrayList<UserRoleVo>();
-						        roles.add(ur);
-						        userFrontVo.setRoles(roles);
-								userFrontVo.setFirstName(firstName);
-								userFrontVo.setLastName(lastName);
-								userFrontVo.setEmailId(emailId);
-								userFrontVo.setPassWord(hashPassword);
-								UserFrontVo userfrontVo2 = userFrontRepository.save(userFrontVo);
-								if (userfrontVo2 != null) {
-									apiResponse = new ApiResponse(true, "SignUp Successfully", userfrontVo2.getEmailId());
-								} else {
-									apiResponse = new ApiResponse(false, "Internal Server Error", null);
+								UserFrontVo user = userFrontRepository.findByEmailIdAndIsDeleted(emailId, 0);
+								if(user == null) {
+									UserFrontVo userFrontVo = new UserFrontVo();
+									List<UserRoleVo> roles = new ArrayList<UserRoleVo>();
+							        roles.add(ur);
+							        userFrontVo.setRoles(roles);
+									userFrontVo.setFirstName(firstName);
+									userFrontVo.setLastName(lastName);
+									userFrontVo.setEmailId(emailId);
+									userFrontVo.setPassWord(hashPassword);
+									UserFrontVo userfrontVo2 = userFrontRepository.save(userFrontVo);
+									if (userfrontVo2 != null) {
+										apiResponse = new ApiResponse(true, "SignUp Successfully", userfrontVo2.getEmailId());
+									} else {
+										apiResponse = new ApiResponse(false, "Internal Server Error", null);
+									}
+								}else {
+									apiResponse = new ApiResponse(false, user.getEmailId()+" Already Registered", null);
 								}
+								
 							}else {
 								apiResponse = new ApiResponse(false, "UserRole Not Found", null);
 							}
@@ -82,6 +88,11 @@ public class UserFrontServiceImpl implements UserFrontService {
 			apiResponse = new ApiResponse(false, "No Users Found", null);
 		}
 		return apiResponse;
+	}
+	
+	@Override
+	public Optional<UserFrontVo> getUserInfoByuserFrontId(long userFrontId) {
+		return userFrontRepository.findById(userFrontId);
 	}
 	
 	
