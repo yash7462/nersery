@@ -24,13 +24,17 @@ public class UserFrontServiceImpl implements UserFrontService {
 	UserRoleRepository userRoleRepository;
 
 	@Override
-	public ApiResponse addUser(String firstName, String lastName, String emailId, String passWord,String role) {
+	public ApiResponse addUser(String firstName, String emailId, String passWord,String role, String age, String weight, String height,String gender) {
 		ApiResponse apiResponse = null;
 		if (firstName != "") {
-			if (lastName != "") {
 				if (emailId != "") {
 					if (passWord != "") {
 						if (role != "") {
+							if (age != "") {
+								if (height != "") {
+									if (weight != "") {
+										if (gender != "") {
+											
 							UserRoleVo ur = userRoleRepository.findByUserRoleName(role);
 							if(ur!=null) {
 								BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
@@ -42,15 +46,23 @@ public class UserFrontServiceImpl implements UserFrontService {
 							        roles.add(ur);
 							        userFrontVo.setRoles(roles);
 									userFrontVo.setFirstName(firstName);
-									userFrontVo.setLastName(lastName);
 									userFrontVo.setEmailId(emailId);
 									userFrontVo.setPassWord(hashPassword);
-									UserFrontVo userfrontVo2 = userFrontRepository.save(userFrontVo);
-									if (userfrontVo2 != null) {
-										apiResponse = new ApiResponse(true, "SignUp Successfully", userfrontVo2.getEmailId());
-									} else {
-										apiResponse = new ApiResponse(false, "Internal Server Error", null);
+									userFrontVo.setAge(Integer.parseInt(age));
+									userFrontVo.setGender(gender);
+									userFrontVo.setHeight(Double.parseDouble(height));
+									userFrontVo.setWeight(Double.parseDouble(weight));
+									try {
+										UserFrontVo userfrontVo2 = userFrontRepository.save(userFrontVo);
+										if (userfrontVo2 != null) {
+											apiResponse = new ApiResponse(true, "SignUp Successfully", userfrontVo2.getEmailId());
+										} else {
+											apiResponse = new ApiResponse(false, "Internal Server Error", null);
+										}
+									}catch (Exception e) {
+										// TODO: handle exception
 									}
+									
 								}else {
 									apiResponse = new ApiResponse(false, user.getEmailId()+" Already Registered", null);
 								}
@@ -58,6 +70,18 @@ public class UserFrontServiceImpl implements UserFrontService {
 							}else {
 								apiResponse = new ApiResponse(false, "UserRole Not Found", null);
 							}
+							}else {
+								apiResponse = new ApiResponse(false, "Gender Is Required", null);
+							}
+							}else {
+								apiResponse = new ApiResponse(false, "Weight Is Required", null);
+							}
+							}else {
+								apiResponse = new ApiResponse(false, "Height Is Required", null);
+							}
+					    }else {
+							apiResponse = new ApiResponse(false, "Age Is Required", null);
+						}
 						}else {
 							apiResponse = new ApiResponse(false, "UserRole Is Required", null);
 						}
@@ -68,9 +92,7 @@ public class UserFrontServiceImpl implements UserFrontService {
 				} else {
 					apiResponse = new ApiResponse(false, "Email Id Is Required", null);
 				}
-			} else {
-				apiResponse = new ApiResponse(false, "Last Name Is Required", null);
-			}
+			
 		} else {
 			apiResponse = new ApiResponse(false, "First Name Is Required", null);
 		}

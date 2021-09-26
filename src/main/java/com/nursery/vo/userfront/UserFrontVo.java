@@ -49,6 +49,18 @@ public class UserFrontVo {
 	@Column(name = "is_deleted", length = 1,columnDefinition = "int default 0")
 	private int isDeleted;
 	
+	@Column(name = "age",columnDefinition = "int default 0")
+	private int age;
+	
+	@Column(name = "gender",columnDefinition = "int default 0")
+	private String gender;
+	
+	@Column(name="height",columnDefinition = "double precision default 0.0")
+	private double height;
+	
+	@Column(name="weight",columnDefinition = "double precision default 0.0")
+	private double weight;
+	
     @CreationTimestamp
     @Column(name = "created_on", updatable = false)
     private Date createdOn;

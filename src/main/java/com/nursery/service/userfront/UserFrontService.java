@@ -7,7 +7,7 @@ import com.nursery.vo.userfront.UserFrontVo;
 
 public interface UserFrontService {
 
-	ApiResponse addUser(String firstName, String lastName, String emailId, String passWord, String role);
+	ApiResponse addUser(String firstName, String emailId, String passWord, String role, String age, String weight, String height,String gender);
 
 	ApiResponse fetchUser();
 
