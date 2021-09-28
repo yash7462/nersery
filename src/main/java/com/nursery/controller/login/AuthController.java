@@ -29,44 +29,47 @@ import com.nursery.service.userfront.UserFrontService;
 import com.nursery.vo.userrole.UserRoleVo;
 
 import lombok.Data;
+
 @Data
 @Controller()
 @RequestMapping("/api/auth")
 public class AuthController {
-	
+
 	@Autowired
 	AuthenticationManager authenticationManager;
 
 	@Autowired
 	JwtProvider jwtProvider;
-	
+
 	@Autowired
 	UserFrontService userFrontService;
-	
+
 	@Autowired
 	UserRoleRepository roleRepository;
 
 	@PostMapping("/signup")
 	@ResponseBody
-	public ResponseEntity<ApiResponse> signUpUser(@RequestParam(name="gender",defaultValue = "",required = true) String gender,@RequestParam(name="weight",defaultValue = "",required = true) String weight,@RequestParam(name="height",defaultValue = "",required = true) String height,@RequestParam(name="age",defaultValue = "",required = true) String age,@RequestParam(name="firstName",defaultValue = "",required = true) String firstName,
-			
-			@RequestParam(name="emailId",defaultValue = "",required = true) String emailId,
-			@RequestParam(name="passWord",defaultValue = "",required = true) String passWord,
-			@RequestParam(name="role",defaultValue = "ROLE_USER",required = false) String role){
+	public ResponseEntity<ApiResponse> signUpUser(
+			@RequestParam(name = "gender", defaultValue = "", required = true) String gender,
+			@RequestParam(name = "weight", defaultValue = "", required = true) String weight,
+			@RequestParam(name = "height", defaultValue = "", required = true) String height,
+			@RequestParam(name = "age", defaultValue = "", required = true) String age,
+			@RequestParam(name = "firstName", defaultValue = "", required = true) String firstName,
+			@RequestParam(name = "emailId", defaultValue = "", required = true) String emailId,
+			@RequestParam(name = "passWord", defaultValue = "", required = true) String passWord,
+			@RequestParam(name = "role", defaultValue = "ROLE_USER", required = false) String role) {
 		ApiResponse apiResponse = null;
-	
-			apiResponse = userFrontService.addUser(firstName,emailId,passWord,role,age,weight,height,gender);
-		
-		
-		
-		
+
+		apiResponse = userFrontService.addUser(firstName, emailId, passWord, role, age, weight, height, gender);
+
 		return ResponseEntity.ok(apiResponse);
 	}
 
 	@PostMapping("/signin")
 	@ResponseBody
-	public ResponseEntity<ApiResponse> authenticateUser(@Valid @RequestBody LoginRequestPayload loginRequest, BindingResult result) {
-		
+	public ResponseEntity<ApiResponse> authenticateUser(@Valid @RequestBody LoginRequestPayload loginRequest,
+			BindingResult result) {
+
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
@@ -74,14 +77,14 @@ public class AuthController {
 
 		String jwt = jwtProvider.generateJwtToken(authentication);
 		ApiResponse apiResponse = null;
-		if(StringUtils.isNotBlank(jwt)) {
-			apiResponse = new ApiResponse(true, "Token Generated Successfully", new JwtResponse(jwt));	
-		}else {
+		if (StringUtils.isNotBlank(jwt)) {
+			apiResponse = new ApiResponse(true, "Token Generated Successfully", new JwtResponse(jwt));
+		} else {
 			apiResponse = new ApiResponse(false, "Token not Generated", null);
 		}
-		
+
 		return ResponseEntity.ok(apiResponse);
-		
+
 //		Authentication authentication = authenticationManager.authenticate(
 //				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 //		
@@ -99,13 +102,13 @@ public class AuthController {
 //				 userDetails.getEmail(), 
 //				 roles));
 	}
-	
+
 	@GetMapping("/getusers")
 	@ResponseBody
-	public ResponseEntity<ApiResponse> fetchAllUser(){
+	public ResponseEntity<ApiResponse> fetchAllUser() {
 		ApiResponse apiResponse = null;
 		apiResponse = userFrontService.fetchUser();
 		return ResponseEntity.ok(apiResponse);
 	}
-	
+
 }

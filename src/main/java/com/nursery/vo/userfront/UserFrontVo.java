@@ -52,7 +52,7 @@ public class UserFrontVo {
 	@Column(name = "age",columnDefinition = "int default 0")
 	private int age;
 	
-	@Column(name = "gender",columnDefinition = "int default 0")
+	@Column(name = "gender")
 	private String gender;
 	
 	@Column(name="height",columnDefinition = "double precision default 0.0")
