@@ -1,6 +1,8 @@
 package com.nursery.controller.login;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -11,6 +13,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,17 +24,22 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.nursery.config.ApiResponse;
+import com.nursery.config.ErrorValidationConfig;
+import com.nursery.repository.userfront.UserFrontRepository;
 import com.nursery.repository.userrole.UserRoleRepository;
+import com.nursery.requestpayload.login.SignUpRequest;
 import com.nursery.securityconfig.JwtProvider;
 import com.nursery.securityconfig.JwtResponse;
 import com.nursery.securityconfig.LoginRequestPayload;
 import com.nursery.service.userfront.UserFrontService;
+import com.nursery.vo.userfront.UserFrontVo;
 import com.nursery.vo.userrole.UserRoleVo;
 
 import lombok.Data;
-
+import lombok.extern.java.Log;
+@Log
 @Data
-@Controller()
+@Controller
 @RequestMapping("/api/auth")
 public class AuthController {
 
@@ -46,6 +54,15 @@ public class AuthController {
 
 	@Autowired
 	UserRoleRepository roleRepository;
+	
+//	@Autowired
+//	UserFrontRepository userFrontRepository;
+//
+//	@Autowired
+//	UserRoleRepository userRoleRepository;
+	
+	@Autowired
+	ErrorValidationConfig errorValidationConfig;
 
 	@PostMapping("/signup")
 	@ResponseBody
@@ -101,6 +118,39 @@ public class AuthController {
 //				 userDetails.getUsername(), 
 //				 userDetails.getEmail(), 
 //				 roles));
+	}
+	
+	/**
+	 * 
+	 * @param signUpRequest is Request Payload for required in signup
+	 * @param result is bind the result of validation
+	 * @return
+	 */
+	@PostMapping("/register")
+	@ResponseBody
+	public ResponseEntity<?> signUpUserByPayload(@Valid @RequestBody SignUpRequest signUpRequest,BindingResult result) {
+
+		if(signUpRequest == null) {
+			log.warning("signuprequest payload is blank");
+				String json = "{"
+						+ "  \"age\": 0,"
+						+ "  \"emailId\": \"string\","
+						+ "  \"firstName\": \"string\","
+						+ "  \"gender\": \"string\","
+						+ "  \"height\": 0,"
+						+ "  \"lastName\": \"string\","
+						+ "  \"passWord\": \"string\","
+						+ "  \"role\": \"string\","
+						+ "  \"weight\": 0"
+						+ "}";	
+			ApiResponse apiResponse = new ApiResponse(false, "SignUp Request Body Required", json);
+			return ResponseEntity.badRequest().body(apiResponse);
+		}else {
+			log.warning("signuprequest payload is available");
+			log.info(signUpRequest.toString());
+			
+			return userFrontService.signUpUserByPayload(signUpRequest,result);
+		}
 	}
 
 	@GetMapping("/getusers")
